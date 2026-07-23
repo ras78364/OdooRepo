@@ -1,0 +1,277 @@
+<odoo>
+    <!-- check_transfer section -->
+
+   <record id="check_transfer_wizard_view_form" model="ir.ui.view">
+    <field name="name">check.transfer.reason.form</field>
+    <field name="model">check.transfer.reason</field>
+    <field name="arch" type="xml">
+        <form>
+            <group>
+                <field name="picking_id" invisible="1"/>
+                <field name="transfer_reason" required="1"/>
+                <field name="transfer_note"/>
+            </group>
+            <footer>
+                <button string="Confirm" type="object" name="action_confirm_transferring" class="btn-primary"/>
+                <button string="Cancel" special="cancel" class="btn-secondary"/>
+            </footer>
+        </form>
+    </field>
+    </record>
+
+     <record id="check_transfer_reason_server_action" model="ir.actions.server">
+        <field name="name">Transfer Stock</field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="binding_model_id" ref="stock.model_stock_picking"/>
+        <field name="state">code</field>
+        <field name="code">
+            action = records.check_transferring_reason()
+        </field>
+    </record>
+
+    <record id="check_transfer_wizard_action" model="ir.actions.act_window">
+        <field name="name">Check Transfer Reason</field>
+        <field name="res_model">check.transfer.reason</field>
+        <field name="target">new</field>
+        <field name="view_mode">form</field>
+    </record>
+
+    <!-- pre-delivery inspection section -->
+
+    <record id="pre_delivery_inspection_wizard_view_form" model="ir.ui.view">
+    <field name="name">pre.delivery.inspection.form</field>
+    <field name="model">pre.delivery.inspection</field>
+    <field name="arch" type="xml">
+        <form>
+            <group>
+                <field name="picking_id" invisible="1"/>
+                <field name="check_products" required="1"/>
+                <field name="check_client_data" required="1"/>
+                <field name="check_packaging" required="1"/>
+                <field name="check_quantity" required="1"/>
+            </group>
+            <footer>
+                <button string="Confirm" type="object" name="confirm_delivery_inspection_action" class="btn-primary"/>
+                <button string="Cancel" special="cancel" class="btn-secondary"/>
+            </footer>
+        </form>
+    </field>
+</record>
+
+    <record id="pre_delivery_inspection_view_form_inherit" model="ir.ui.view">
+            <field name="name">pre_delivery.inspection.view.form.inherit</field>
+            <field name="model">stock.picking</field>
+            <field name="inherit_id" ref="stock.view_picking_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//header" position="inside">
+                   <button type="object" string="Verify Delivery" name="pre_delivery_inspection" class="btn-primary" invisible="is_inspection_done == True or state in ('done', 'cancel', 'assigned')"/>
+                </xpath>
+                 <xpath expr="//button[@name='button_validate'][2]" position="attributes">
+                <attribute name="groups">base.group_system,odoo_tasks.group_picking_validator</attribute>
+            </xpath>
+                   <xpath expr="//field[@name='move_ids']//list//field[@name='quantity']" position="attributes">
+            <attribute name="readonly">not is_quantity_done_editable or not env.user.has_group('odoo_tasks.group_picking_validator')</attribute>
+            </xpath>
+                <xpath expr="//field[@name='move_ids']//field[@name='quantity']" position="replace">
+            <field name="quantity" groups="odoo_tasks.group_picking_validator"/>
+            <field name="quantity" readonly="1" groups="!odoo_tasks.group_picking_validator"/>
+        </xpath>
+
+            </field>
+    </record>
+    <record id="pre_delivery_inspection_wizard_action" model="ir.actions.act_window">
+        <field name="name">Pre-Delivery Inspection</field>
+        <field name="res_model">pre.delivery.inspection</field>
+        <field name="target">new</field>
+        <field name="view_mode">form</field>
+    </record>
+
+    <!-- check barcode product section -->
+
+
+<record id="check_barcode_product_view_form_inherit" model="ir.ui.view">
+        <field name="name">check.barcode.product.view.form.inherit</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[.//field[@name='qty_available']]" position="inside">
+                <label for="requires_barcode" string="Require Barcode"/>
+                <field name="requires_barcode"/>
+            </xpath>
+        </field>
+    </record>
+
+
+     <!-- stock quant section -->
+
+ <record id="view_stock_quant_form_inherit" model="ir.ui.view">
+    <field name="name">stock.quant.form.inherit</field>
+    <field name="model">stock.quant</field>
+    <field name="inherit_id" ref="stock.view_stock_quant_form"/>
+    <field name="arch" type="xml">
+       <xpath expr="//group[1]" position="before">
+            <header>
+                <field name="state" widget="statusbar" statusbar_visible="draft,waiting_approval,done"/>
+                <button name="action_approve"
+                    string="Approve"
+                    type="object"
+                    class="btn-primary"
+                    invisible="state != 'waiting_approval'"/>
+                <button name="action_reject"
+                    string="Reject"
+                    type="object"
+                    class="btn-secondary"
+                    invisible="state != 'waiting_approval'"/>
+            </header>
+        </xpath>
+    </field>
+</record>
+
+    <record id="check_inventory_threshold" model="ir.config_parameter">
+        <field name="key">stock.check_inventory_threshold</field>
+        <field name="value">5</field>
+    </record>
+
+
+
+    <record id="view_stock_quant_list_inherit" model="ir.ui.view">
+        <field name="name">stock.quant.list.inherit</field>
+        <field name="model">stock.quant</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="product_id"/>
+                <field name="location_id"/>
+                <field name="quantity"/>
+                <field name="inventory_quantity"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="stock_quant_action" model="ir.actions.act_window">
+        <field name="name">Stock Quants</field>
+        <field name="res_model">stock.quant</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_stock_quant_list_inherit"/>
+        <field name="context">{'search_default_internal_loc': 1}</field>
+    </record>
+
+    <!-- low stock products -->
+
+  <record id="view_product_search_low_stock" model="ir.ui.view">
+    <field name="name">product.product.search.low.stock</field>
+    <field name="model">product.product</field>
+    <field name="arch" type="xml">
+        <search>
+            <filter string="Low Stock Alert" name="low_stock_filter"
+                    domain="[('qty_available', '&lt;', 10)]"/>
+        </search>
+    </field>
+</record>
+
+<record id="action_low_stock_report" model="ir.actions.act_window">
+    <field name="name">Low Stock Report</field>
+    <field name="res_model">product.product</field>
+    <field name="view_mode">list,form</field>
+    <field name="search_view_id" ref="view_product_search_low_stock"/>
+    <field name="context">{'search_default_low_stock_filter': 1}</field>
+</record>
+
+    <!-- inventory adjustment reason  -->
+
+
+    <record id="inventory_adjustment_reason_view_list_inherit" model="ir.ui.view">
+         <field name="name">inventory.adjustment.reason.view.list.inherit</field>
+        <field name="model">stock.quant</field>
+        <field name="inherit_id" ref="stock.view_stock_quant_tree_inventory_editable"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//field[@name='inventory_diff_quantity']" position="after">
+                <field name="inventory_reason" optional="show"/>
+                <field name="state" widget="badge"
+                 decoration-muted="state == 'draft'"
+                 decoration-info="state == 'waiting_approval'"
+                  decoration-success="state == 'approved'"
+                  decoration-danger="state == 'rejected'"
+                       decoration-primary="state == 'done'"/>
+
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_approve_inventory_bulk" model="ir.actions.server">
+        <field name="name">Approve Inventory Adjustment</field>
+        <field name="model_id" ref="stock.model_stock_quant"/>
+        <field name="binding_model_id" ref="stock.model_stock_quant"/>
+        <field name="state">code</field>
+        <field name="code">
+            if records:
+                records.filtered(lambda r: r.state == 'waiting_approval').action_approve()
+
+        </field>
+    </record>
+
+    <record id="action_reject_inventory_bulk" model="ir.actions.server">
+    <field name="name">Reject Inventory Adjustment</field>
+    <field name="model_id" ref="stock.model_stock_quant"/>
+    <field name="binding_model_id" ref="stock.model_stock_quant"/>
+    <field name="binding_view_types">list</field>
+    <field name="state">code</field>
+    <field name="code">
+records.filtered(lambda r: r.state == 'waiting_approval').action_reject()
+    </field>
+</record>
+
+    <!-- returned_delivery_check  -->
+
+    <record id="view_picking_form_inherit_custom_return" model="ir.ui.view">
+    <field name="name">stock.picking.form.inherit.custom.return</field>
+    <field name="model">stock.picking</field>
+    <field name="inherit_id" ref="stock.view_picking_form"/>
+    <field name="arch" type="xml">
+       <xpath expr="//button[@name='%(stock.act_stock_return_picking)d']" position="attributes">
+            <attribute name="name">returned_delivery</attribute>
+            <attribute name="type">object</attribute>
+        </xpath>
+    </field>
+</record>
+
+   <record id="check_returned_goods_wizard_view_form" model="ir.ui.view">
+    <field name="name">check_returned_goods.form</field>
+    <field name="model">check.returned.deliveries.wizard</field>
+    <field name="arch" type="xml">
+        <form>
+            <group>
+                <field name="picking_id" invisible="1"/>
+                <field name="return_reason" required="1"/>
+            </group>
+            <footer>
+                <button string="Confirm" type="object" name="confirm_returned_delivery" class="btn-primary"/>
+                <button string="Cancel" special="cancel" class="btn-secondary"/>
+            </footer>
+        </form>
+    </field>
+</record>
+
+    <record id="returned_delivery_wizard_action" model="ir.actions.act_window">
+        <field name="name">returned delivery wizard</field>
+        <field name="res_model">check.returned.deliveries.wizard</field>
+        <field name="target">new</field>
+        <field name="view_mode">form</field>
+    </record>
+
+    <menuitem id="menu_low_stock_report"
+              name="Low Stock Report"
+              parent="odoo_tasks_menu_main"
+              action="action_low_stock_report"
+              sequence="5"/>
+
+
+    <menuitem id="menu_stock_quants" name="Quants"
+              parent="stock.menu_stock_adjustments"
+              action="odoo_tasks.stock_quant_action"
+              sequence="10"/>
+
+
+</odoo>

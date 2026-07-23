@@ -1,0 +1,19 @@
+.page h2 {
+  color: #1a73e8;
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+.page p {
+  font-size: 12px;
+  color: #333333;
+  margin: 4px 0;
+}
+/* Ensure table styles are applied in PDF */
+.table-report {
+  width: 100%;
+  border-collapse: collapse;
+}
+.table-report td, .table-report th {
+  border: 1px solid #ddd;
+  padding: 6px;
+}

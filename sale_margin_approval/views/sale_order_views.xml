@@ -1,0 +1,30 @@
+<odoo>
+<record id="check_orders_beneath_cost_form_view" model="ir.ui.view">
+    <field name="name">check.orders.beneath.cost.form.view</field>
+    <field name="model">sale.order</field>
+    <field name="inherit_id" ref="sale.view_order_form"/>
+    <field name="arch" type="xml">
+        <xpath expr="//header" position="inside">
+            <button name="action_open_approval_wizard"
+                    string="Submit for Approval"
+                    type="object"
+                    class="btn-primary"
+                    invisible="approval_status != 'waiting_approval'"/>
+        </xpath>
+        <xpath expr="//field[@name='payment_term_id']" position="after">
+            <field name="approver_id" readonly="1"/>
+            <field name="approval_status" invisible="approval_status != 'approved'"/>
+            <field name="approval_reason" invisible="approval_status != 'approved'"/>
+        </xpath>
+    </field>
+
+</record>
+<record id="check_orders_beneath_cost_action" model="ir.actions.act_window">
+        <field name="name">check.orders.beneath.cost</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">list,form</field>
+    </record>
+        <menuitem id="menu_all_orders" name="All Orders"
+              parent="menu_sale_margin_root"
+              action="check_orders_beneath_cost_action" sequence="1"/>
+</odoo>

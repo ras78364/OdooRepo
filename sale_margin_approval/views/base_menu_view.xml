@@ -1,0 +1,11 @@
+<odoo>
+    <menuitem id="menu_sale_margin_root"
+              name="Margin Approval"
+           />
+
+    <menuitem id="menu_sale_margin_orders"
+              name="Orders"
+              parent="menu_sale_margin_root"
+              action="sale.action_quotations_with_onboarding"
+              sequence="1"/>
+</odoo>

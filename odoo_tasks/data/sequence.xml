@@ -1,0 +1,12 @@
+<odoo>
+    <data>
+   <record id="bill_ref_view_form_inherit" model="ir.sequence">
+            <field name="name">Bill Ref Seq</field>
+            <field name="code">Bill_seq</field>
+            <field name="prefix">BLL</field>
+            <field name="padding">5</field>
+
+    </record>
+</data>
+
+</odoo>

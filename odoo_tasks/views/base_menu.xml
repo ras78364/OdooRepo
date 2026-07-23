@@ -1,0 +1,6 @@
+<odoo>
+<menuitem id="odoo_tasks_menu_main"
+              name="Odoo Tasks"
+              sequence="10"/>
+
+</odoo>

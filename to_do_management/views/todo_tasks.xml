@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="todo_tasks_view_list" model="ir.ui.view">
+        <field name="name">todo.tasks.list</field>
+        <field name="model">todo_task</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="due_date &lt; current_date and state != 'closed'">
+                <field name="task_name" width="150px"/>
+                <field name="assign_to" width="150px"/>
+                <field name="description" invisible="1"/>
+                <field name="due_date"/>
+                <field name="status" width="150px"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="todo_tasks_view_form" model="ir.ui.view">
+        <field name="name">todo.tasks.form</field>
+        <field name="model">todo_task</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <header>
+                        <button name="action_draft" type="object" class="btn-primary" string="Set To Draft"
+                                invisible="state in('draft','closed')"/>
+                        <button name="action_pending" type="object" class="btn-secondary" string="Pending"
+                                invisible="state!= 'draft'"/>
+                        <button name="action_sold" type="object" class="btn-success" string="Sold"
+                                invisible="state!= 'pending'"/>
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                    <group>
+                        <group string="General Info.">
+                            <field name="task_name" required="1" readonly="state == 'closed'"/>
+                            <field name="assign_to" required="1" readonly="state == 'closed'"/>
+                            <field name="description" required="1" readonly="state == 'closed'"/>
+                        </group>
+                        <group string="Additional Info.">
+                            <field name="due_date" readonly="state == 'closed'"/>
+                            <field name="status" readonly="state == 'closed'"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="todo_tasks_view_search" model="ir.ui.view">
+        <field name="name">todo.task.search</field>
+        <field name="model">todo_task</field>
+        <field name="arch" type="xml">
+            <search string="Search Tasks">
+                <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="to_do_management_action_id" model="ir.actions.act_window">
+        <field name="name">To-Do Tasks</field>
+        <field name="res_model">todo_task</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Corrected Server Action with Unique ID -->
+    <record id="todo_task_action_close_server" model="ir.actions.server">
+        <field name="name">Close</field>
+        <field name="model_id" ref="model_todo_task"/>
+        <field name="binding_model_id" ref="model_todo_task"/>
+        <field name="state">code</field>
+        <field name="code">
+            action = records.action_todo_task_close()
+        </field>
+    </record>
+
+    <!-- Corrected Cron Job with Unique ID -->
+    <record id="todo_task_cron_check_due_date" model="ir.cron">
+        <field name="name">Check due date</field>
+        <field name="model_id" ref="model_todo_task"/>
+        <field name="state">code</field>
+        <field name="code">model.check_task_due_date()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active">True</field>
+    </record>
+
+    <menuitem
+        id="all_task_menu_item"
+        name="All Tasks"
+        parent="to_do_management_menu_root"
+        action="to_do_management_action_id"
+    />
+</odoo>

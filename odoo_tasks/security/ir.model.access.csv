@@ -1,0 +1,10 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_check_discount_reason,access.check.discount.reason,model_check_discount_reason,,1,1,1,1
+access_check_sale_order_cancellation,access.check.sale.order.cancellation,model_check_sale_order_cancellation,,1,1,1,1
+access_check_transfer_reason,access.check.transfer.reason,model_check_transfer_reason,,1,1,1,1
+access_pre_delivery_inspection,access.pre.delivery.inspection,model_pre_delivery_inspection,,1,1,1,1
+access_check_returned_deliveries_wizard,access.check.returned.deliveries.wizard,model_check_returned_deliveries_wizard,,1,1,1,1
+access_check_invoice_cancellation,access.check.invoice.cancellation,model_check_invoice_cancellation,,1,1,1,1
+access_report_by_salesman_wizard,access.report.by.salesman.wizard,model_report_by_salesman_wizard,,1,1,1,1
+access_report_by_unpaid_invoice_wizard,access.report.by.unpaid.invoice.wizard,model_report_by_unpaid_invoice_wizard,,1,1,1,1
+

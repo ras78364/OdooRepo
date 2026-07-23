@@ -1,0 +1,68 @@
+<odoo>
+    <record id="report_by_unpaid_invoice" model="ir.actions.report">
+        <field name="name">Report By Salesman</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">report</field>
+        <field name="report_name">odoo_tasks.report_by_unpaid_invoice_template</field>
+    </record>
+
+    <template id="report_by_unpaid_invoice_template">
+        <t t-call="web.html_container">
+            <t t-call="web.basic_layout">
+                <div class="page">
+                    <style>
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-top: 20px;
+                        }
+                        th, td {
+                            border: 1px solid #b3adad;
+                            padding: 8px;
+                            text-align: left;
+                        }
+                        th {
+                            background: #f0f0f0;
+                        }
+                    </style>
+
+                    <h2>Unpaid Invoices Report</h2>
+
+                    <div style="margin-bottom: 20px;">
+                        <p t-if="partner_id"><strong>Customer:</strong> <t t-esc="partner_id.name"/></p>
+                        <p t-if="start_date"><strong>From Date:</strong> <t t-esc="start_date"/></p>
+                        <p t-if="end_date"><strong>To Date:</strong> <t t-esc="end_date"/></p>
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Invoice Number</th>
+                                <th>Customer</th>
+                                <th>Invoice Date</th>
+                                <th>Due Date</th>
+                                <th>Status</th>
+                                <th>Amount Due</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="docs" t-as="record">
+                                <tr>
+                                    <td><t t-esc="record.name"/></td>
+                                    <td><t t-esc="record.partner_id.display_name"/></td>
+                                    <td><t t-esc="record.invoice_date"/></td>
+                                    <td><t t-esc="record.invoice_date_due"/></td>
+                                    <!-- Using your custom defined status field -->
+                                    <td><t t-esc="record.status_in_payment"/></td>
+                                    <td><t t-esc="record.amount_residual"/></td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>
